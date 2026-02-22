@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Campus Resource Dashboard</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        body {
+            background: linear-gradient(to right, #141e30, #243b55);
+            color: white;
+            min-height: 100vh;
+        }
+
+        .navbar {
+            transition: 0.4s;
+        }
+
+        .navbar.scrolled {
+            background-color: rgba(0,0,0,0.8);
+        }
+
+        .card {
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+        }
+
+        .logo {
+            height: 40px;
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar navbar-expand-lg navbar-dark fixed-top bg-transparent px-4">
+    <a class="navbar-brand fw-bold" href="#">
+        <img src="https://upload.wikimedia.org/wikipedia/en/3/3b/Lovely_Professional_University_logo.png" class="logo">
+        LPU Campus Analytics
+    </a>
+</nav>
+
+<div class="container py-5" style="margin-top:100px;">
+
+    <h1 class="text-center mb-5">📊 Campus Resource & Workload Dashboard</h1>
+
+    <!-- ANALYTICS CARDS -->
+    <div class="row text-center mb-4">
+        <div class="col-md-6">
+            <div class="card p-4 text-dark">
+                <h5>Total Classrooms</h5>
+                <h2>{{ total_rooms }}</h2>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card p-4 text-dark">
+                <h5>Average Utilization</h5>
+                <h2>{{ avg_util }} %</h2>
+            </div>
+        </div>
+    </div>
+
+    <!-- FORMS -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card p-4 text-dark">
+                <h4>Add Classroom</h4>
+                <form method="POST">
+                    <input name="classroom_name" class="form-control mb-2" placeholder="Room Name" required>
+                    <input name="capacity" type="number" class="form-control mb-2" placeholder="Capacity" required>
+                    <input name="enrolled" type="number" class="form-control mb-2" placeholder="Enrolled Students" required>
+                    <button class="btn btn-primary">Add</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card p-4 text-dark">
+                <h4>Add Faculty</h4>
+                <form method="POST">
+                    <input name="faculty_name" class="form-control mb-2" placeholder="Faculty Name" required>
+                    <input name="courses" type="number" class="form-control mb-2" placeholder="Courses Assigned" required>
+                    <button class="btn btn-success">Add</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- CHARTS -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card p-4 text-dark">
+                <h5>Classroom Utilization (%)</h5>
+                <canvas id="utilChart"></canvas>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card p-4 text-dark">
+                <h5>Faculty Workload (Courses)</h5>
+                <canvas id="facultyChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    // Navbar animation
+    window.addEventListener("scroll", function() {
+        const navbar = document.querySelector(".navbar");
+        navbar.classList.toggle("scrolled", window.scrollY > 50);
+    });
+
+    // Classroom Utilization Chart
+    const utilCtx = document.getElementById('utilChart').getContext('2d');
+    new Chart(utilCtx, {
+        type: 'bar',
+        data: {
+            labels: {{ room_names | tojson }},
+            datasets: [{
+                label: 'Utilization %',
+                data: {{ utilization_values | tojson }},
+                backgroundColor: '#0072ff'
+            }]
+        },
+        options: {
+            responsive: true
+        }
+    });
+
+    // Faculty Workload Chart
+    const facultyCtx = document.getElementById('facultyChart').getContext('2d');
+    new Chart(facultyCtx, {
+        type: 'bar',
+        data: {
+            labels: {{ faculty_names | tojson }},
+            datasets: [{
+                label: 'Courses Assigned',
+                data: {{ faculty_courses | tojson }},
+                backgroundColor: '#28a745'
+            }]
+        },
+        options: {
+            responsive: true
+        }
+    });
+</script>
+
+</body>
+</html>
